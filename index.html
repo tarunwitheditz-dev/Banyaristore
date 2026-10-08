@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banyari Gernal Store | 1 KM Express Delivery</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        banyari: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            600: '#15803d',
+                            700: '#166534',
+                            800: '#14532d',
+                            900: '#064e3b',
+                        },
+                        amberGold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased pb-24 md:pb-8 min-h-screen flex flex-col">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-banyari-900 text-banyari-100 text-xs sm:text-sm py-2 px-4 text-center font-medium flex items-center justify-center gap-2 shadow-inner">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amberGold-500 text-gray-900 animate-pulse">
+            ⚡ 15-30 Min Express Delivery
+        </span>
+        <span><b id="announcementStoreName">Banyari Gernal Store</b> • Direct Delivery within 1 KM Radius!</span>
+    </div>
+
+    <!-- Admin Status Banner (Visible when owner admin mode is logged in) -->
+    <div id="adminModeBanner" class="hidden bg-amberGold-500 text-gray-900 px-4 py-2 text-xs sm:text-sm font-bold flex flex-wrap items-center justify-between gap-2 shadow-md">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-user-shield text-base"></i>
+            <span>STORE OWNER EDIT MODE ACTIVE — Click "Edit Price" on any item below.</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openStorePhoneModal()" class="bg-emerald-900 hover:bg-emerald-800 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                <i class="fa-brands fa-whatsapp"></i> Shop WhatsApp
+            </button>
+            <button onclick="openChangePinModal()" class="bg-banyari-900 hover:bg-banyari-800 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                <i class="fa-solid fa-key"></i> Change Security PIN
+            </button>
+            <button onclick="openAddProductModal()" class="bg-gray-900 hover:bg-gray-800 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+            <button onclick="exitAdminMode()" class="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded-lg text-xs font-bold transition-all">
+                Exit Admin
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center justify-between gap-2 sm:gap-4">
+                
+                <!-- Logo & Store Name -->
+                <div class="flex items-center gap-3">
+                    <a href="#" class="flex items-center gap-2.5 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-banyari-600 to-emerald-500 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-banyari-600/20 group-hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <div>
+                            <span class="text-base sm:text-xl font-extrabold text-banyari-900 tracking-tight block leading-tight" id="headerStoreTitle">
+                                Banyari <span class="text-amberGold-600">Gernal Store</span>
+                            </span>
+                            <span class="text-[10px] text-gray-500 font-semibold tracking-wider uppercase block">Your Trusted Local Karyana</span>
+                        </div>
+                    </a>
+
+                    <!-- Location Chip -->
+                    <button onclick="openRadiusModal()" class="hidden md:flex items-center gap-2 bg-banyari-50 hover:bg-banyari-100 text-banyari-800 px-3 py-1.5 rounded-full text-xs font-semibold border border-banyari-200/60 transition-colors">
+                        <i class="fa-solid fa-location-dot text-banyari-600"></i>
+                        <span id="headerLocationText" class="truncate max-w-[150px]">Nearby Banyari Store (&lt; 1 KM)</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] opacity-70"></i>
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md mx-2">
+                    <div class="relative">
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search Atta, Milk, Mustard Oil, Dal, Maggi..." class="w-full bg-gray-100 focus:bg-white text-sm pl-9 pr-8 py-2 rounded-xl border border-transparent focus:border-banyari-500 focus:ring-2 focus:ring-banyari-200 outline-none transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-sm"></i>
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 text-sm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Owner Admin Mode Trigger Button -->
+                    <button id="adminLoginBtn" onclick="toggleAdminAuthModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5" title="Store Owner Edit Mode">
+                        <i class="fa-solid fa-user-gear text-sm text-banyari-700"></i>
+                        <span class="hidden lg:inline">Edit Prices</span>
+                    </button>
+
+                    <button onclick="toggleCartDrawer(true)" class="relative flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl font-bold shadow-md shadow-emerald-600/20 active:scale-95 transition-all">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span class="hidden sm:inline text-sm">Order Cart</span>
+                        <span id="cartBadge" class="bg-amberGold-400 text-gray-900 font-extrabold text-xs px-2 py-0.5 rounded-full min-w-[20px] text-center">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Location & Express Bar -->
+            <div class="mt-2 pt-2 border-t border-gray-100 flex md:hidden items-center justify-between text-xs text-gray-600">
+                <span class="flex items-center gap-1.5 font-medium">
+                    <i class="fa-solid fa-motorcycle text-banyari-600"></i>
+                    Fast Delivery in <b>15-30 Mins</b>
+                </span>
+                <button onclick="openRadiusModal()" class="text-banyari-700 font-bold flex items-center gap-1 underline underline-offset-2">
+                    <span id="mobileLocationText">Within 1 KM Radius</span>
+                    <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full">
+
+        <!-- Hero Feature Card -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-banyari-800 via-banyari-700 to-emerald-800 text-white p-5 sm:p-8 mb-6 shadow-lg border border-banyari-600/30">
+            <div class="relative z-10 max-w-xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-amberGold-400 text-xs font-semibold mb-3 border border-white/10">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Order Specialist
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight mb-2" id="heroStoreTitle">
+                    Banyari Gernal Store <span class="text-amberGold-400">1 KM Express</span>
+                </h1>
+                <p class="text-banyari-100 text-xs sm:text-sm mb-4 leading-relaxed">
+                    Select daily grocery items and send your order straight to the shopkeeper's WhatsApp for instant packing & 15-30 minute delivery!
+                </p>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openRadiusModal()" class="bg-amberGold-500 hover:bg-amberGold-600 text-gray-900 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-crosshairs"></i> Check Delivery Eligibility
+                    </button>
+                    <a href="javascript:void(0)" onclick="toggleCartDrawer(true)" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-white border border-emerald-400/40 font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp"></i> View Cart & Send Order
+                    </a>
+                </div>
+            </div>
+            <div class="absolute -right-8 -bottom-8 w-56 h-56 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+        </div>
+
+        <!-- Admin Control Toolbar (Visible when Admin Mode is Active) -->
+        <div id="adminToolbar" class="hidden bg-emerald-900 text-white p-4 rounded-2xl mb-6 shadow-md border border-emerald-700">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-sm font-bold text-emerald-300 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Store Owner Catalog & Security Control
+                    </h3>
+                    <p class="text-xs text-emerald-100 mt-0.5">Edit prices, update WhatsApp target number, or change security PIN.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="openStorePhoneModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 border border-emerald-400/40">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Shop WhatsApp Number
+                    </button>
+                    <button onclick="openChangePinModal()" class="bg-amberGold-400 hover:bg-amberGold-500 text-gray-900 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-key"></i> Change Security PIN
+                    </button>
+                    <button onclick="openAddProductModal()" class="bg-amberGold-500 hover:bg-amberGold-600 text-gray-900 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-square-plus text-sm"></i> Add New Product
+                    </button>
+                    <button onclick="resetToDefaultCatalog()" class="bg-red-600/80 hover:bg-red-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Prices
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Selector Chips -->
+        <section class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked text-banyari-600"></i> Grocery Categories
+                </h2>
+                <span id="itemCountText" class="text-xs font-semibold text-gray-500">Showing items</span>
+            </div>
+            
+            <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-2 pt-1">
+                <!-- Categories rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- Product Grid Section -->
+        <section class="mb-10">
+            <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-5">
+                <!-- Products rendered dynamically -->
+            </div>
+
+            <!-- Empty Search Results -->
+            <div id="emptyState" class="hidden text-center py-12 bg-white rounded-2xl border border-gray-100 shadow-sm my-4">
+                <div class="w-16 h-16 bg-banyari-50 rounded-full flex items-center justify-center text-banyari-600 text-2xl mx-auto mb-3">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">No matching item found</h3>
+                <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">Try searching for Atta, Mustard Oil, Milk, Dal, or Tea.</p>
+                <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-banyari-600 text-white text-xs font-semibold rounded-xl hover:bg-banyari-700 transition-colors">
+                    Reset Search Filter
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Store Owner Admin Login Modal -->
+    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button onclick="toggleAdminAuthModal(false)" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-banyari-100 rounded-full flex items-center justify-center text-banyari-800 text-xl mx-auto mb-2">
+                    <i class="fa-solid fa-user-lock"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Store Owner Login</h3>
+                <p class="text-xs text-gray-500 mt-1">Enter your security PIN to unlock price editing and owner panel</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1 text-center">Enter Security PIN</label>
+                    <input type="password" id="adminPinInput" required placeholder="Default PIN: 1234" class="w-full text-center tracking-widest text-lg border border-gray-300 rounded-xl px-3 py-2 font-bold outline-none focus:border-banyari-500">
+                </div>
+
+                <div id="adminAuthError" class="hidden text-xs text-red-600 font-bold text-center">Incorrect PIN! Default PIN is 1234.</div>
+                <div id="pinModalHint" class="text-[11px] text-gray-400 text-center">Default PIN is <b class="text-emerald-700">1234</b></div>
+
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleAdminAuthModal(false)" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-xs transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 bg-banyari-700 hover:bg-banyari-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-md">
+                        Login
+                    </button>
+                </div>
+
+                <div class="text-center pt-1">
+                    <button type="button" onclick="resetAdminPIN()" class="text-[11px] text-banyari-700 hover:underline font-semibold">
+                        Reset PIN to Default (1234)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Store Owner WhatsApp Number Configuration Modal (Admin Only) -->
+    <div id="storePhoneModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button onclick="closeStorePhoneModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 text-xl mx-auto mb-2">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Set WhatsApp Order Number</h3>
+                <p class="text-xs text-gray-500 mt-1">Orders placed by customers will be sent directly to this WhatsApp contact number.</p>
+            </div>
+
+            <form onsubmit="handleSaveStoreNumber(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Store Owner WhatsApp Number</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-xs font-bold text-gray-400">+91</span>
+                        <input type="tel" id="modalStorePhoneNumber" required placeholder="e.g. 9876543210" class="w-full bg-gray-50 border border-gray-300 rounded-xl pl-10 pr-3 py-2 text-sm font-bold text-gray-800 outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center gap-2">
+                    <button type="button" onclick="closeStorePhoneModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-xs transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-md">
+                        Save Number
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Admin PIN Modal -->
+    <div id="changePinModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button onclick="closeChangePinModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-amberGold-100 rounded-full flex items-center justify-center text-amberGold-700 text-xl mx-auto mb-2">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Change Security PIN</h3>
+                <p class="text-xs text-gray-500 mt-1">Set a new security PIN for Store Owner access</p>
+            </div>
+
+            <form onsubmit="handleSaveNewPin(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Current PIN</label>
+                    <input type="password" id="currentPinInput" required placeholder="Enter Current PIN" class="w-full text-center tracking-widest border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold outline-none focus:border-banyari-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">New Security PIN (4-8 digits)</label>
+                    <input type="password" id="newPinInput" required placeholder="Enter New PIN" class="w-full text-center tracking-widest border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold outline-none focus:border-banyari-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Confirm New PIN</label>
+                    <input type="password" id="confirmNewPinInput" required placeholder="Confirm New PIN" class="w-full text-center tracking-widest border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold outline-none focus:border-banyari-500">
+                </div>
+
+                <div id="changePinError" class="hidden text-xs text-red-600 font-bold text-center"></div>
+
+                <div class="pt-2 flex items-center gap-2">
+                    <button type="button" onclick="closeChangePinModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-xs transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-md">
+                        Update PIN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Item Modal -->
+    <div id="editProductModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeEditModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4 border-b border-gray-100 pb-3">
+                <div class="w-10 h-10 rounded-xl bg-amberGold-100 text-amberGold-700 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-gray-900" id="editModalTitle">Edit Item Price & Details</h3>
+                    <p class="text-xs text-gray-500">Update price, item name, unit, or category below</p>
+                </div>
+            </div>
+
+            <form id="editProductForm" onsubmit="saveProductChanges(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="editProductId">
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Item Name (English / Hinglish)</label>
+                    <input type="text" id="editProductName" required class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-semibold">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Hindi Subtitle / Name</label>
+                    <input type="text" id="editProductHindi" class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Selling Price (₹)</label>
+                        <input type="number" id="editProductPrice" min="0" step="1" required class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-bold text-emerald-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">MRP Price (₹)</label>
+                        <input type="number" id="editProductMRP" min="0" step="1" required class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500 font-bold text-gray-700 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Unit / Size (e.g. 1 kg, 500 ml)</label>
+                        <input type="text" id="editProductUnit" required class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Category</label>
+                        <select id="editProductCategory" class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500 bg-white">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="editProductImage" class="w-full border border-gray-300 rounded-lg px-3 py-2 outline-none focus:border-emerald-500 text-[11px]">
+                </div>
+
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="editProductInStock" class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500">
+                    <label for="editProductInStock" class="font-bold text-gray-800 cursor-pointer">In Stock (Available for WhatsApp ordering)</label>
+                </div>
+
+                <div class="pt-3 border-t border-gray-100 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors shadow-md">
+                        Save Item Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cart Slide-Over Drawer -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden pointer-events-none">
+        <div id="cartBackdrop" onclick="toggleCartDrawer(false)" class="absolute inset-0 bg-gray-900/50 backdrop-blur-xs opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div id="cartPanel" class="w-screen max-w-md bg-white shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto">
+                
+                <!-- Drawer Header -->
+                <div class="px-5 py-4 bg-banyari-900 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-emerald-400 text-xl"></i>
+                        <div>
+                            <h3 class="text-base font-bold leading-tight">Banyari Store Cart</h3>
+                            <span id="drawerCartCount" class="text-[11px] text-banyari-200">0 items selected</span>
+                        </div>
+                    </div>
+                    <button onclick="toggleCartDrawer(false)" class="text-banyari-200 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- 1 KM Delivery Notice Bar -->
+                <div class="bg-amberGold-50 px-5 py-2.5 border-b border-amberGold-200/60 flex items-center justify-between text-xs">
+                    <span class="text-amberGold-900 font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-amberGold-600"></i>
+                        Free Delivery Zone: <b>Under 1 KM</b>
+                    </span>
+                    <span class="text-banyari-800 font-bold">⏱️ 15-30 Mins</span>
+                </div>
+
+                <!-- Cart Items Scrollable List -->
+                <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-5 divide-y divide-gray-100">
+                    <!-- Cart items rendered dynamically -->
+                </div>
+
+                <!-- Cart Footer & Order Details Form -->
+                <div id="cartFooter" class="p-5 bg-gray-50 border-t border-gray-200">
+                    <div class="space-y-1 text-xs text-gray-600 mb-4">
+                        <div class="flex justify-between">
+                            <span>Subtotal</span>
+                            <span id="summarySubtotal" class="font-semibold text-gray-800">₹0</span>
+                        </div>
+                        <div class="flex justify-between text-banyari-700">
+                            <span>1 KM Express Delivery</span>
+                            <span class="font-bold">FREE</span>
+                        </div>
+                        <div class="flex justify-between text-amberGold-700 font-medium">
+                            <span>Total Savings</span>
+                            <span id="summarySavings">₹0</span>
+                        </div>
+                        <div class="flex justify-between text-sm font-extrabold text-gray-900 pt-2 border-t border-gray-200">
+                            <span>Total Payable Amount</span>
+                            <span id="summaryTotal" class="text-banyari-700">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Details Inputs -->
+                    <div class="space-y-2 mb-4">
+                        <div class="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-user text-banyari-600"></i> Customer Delivery Info
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="custName" placeholder="Your Full Name *" class="w-full bg-white text-xs px-3 py-2 rounded-lg border border-gray-300 focus:border-banyari-500 outline-none">
+                            <input type="tel" id="custPhone" placeholder="Mobile Number *" class="w-full bg-white text-xs px-3 py-2 rounded-lg border border-gray-300 focus:border-banyari-500 outline-none">
+                        </div>
+                        <input type="text" id="custAddress" placeholder="House/Flat No., Street (Within 1 KM) *" class="w-full bg-white text-xs px-3 py-2 rounded-lg border border-gray-300 focus:border-banyari-500 outline-none">
+                        <input type="text" id="custLandmark" placeholder="Nearby Landmark (e.g. Near Shiv Temple)" class="w-full bg-white text-xs px-3 py-2 rounded-lg border border-gray-300 focus:border-banyari-500 outline-none">
+                    </div>
+
+                    <button onclick="placeWhatsAppOrder()" id="whatsappBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                        <span>Place Order via WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1 KM Eligibility Check Modal -->
+    <div id="radiusModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button onclick="closeRadiusModal()" class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-banyari-100 rounded-full flex items-center justify-center text-banyari-700 text-xl mx-auto mb-2">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Check 1 KM Delivery Eligibility</h3>
+                <p class="text-xs text-gray-500 mt-1">Banyari Gernal Store delivers strictly within <b>1 KM radius</b> for instant 15-30 minute service.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Enter Street / Locality / Pincode</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="pincodeInput" value="180001" placeholder="Enter locality or pincode" class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-banyari-500">
+                        <button onclick="verifyLocation()" class="bg-banyari-600 text-white font-semibold px-4 py-2 rounded-xl text-xs hover:bg-banyari-700 transition-colors">
+                            Verify Zone
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink mx-2 text-[10px] text-gray-400 uppercase font-semibold">Popular Localities</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="selectQuickLocation('Banyari Main Chowk')" class="p-2.5 border border-banyari-200 bg-banyari-50/60 rounded-xl text-left hover:border-banyari-500 transition-colors">
+                        <div class="text-xs font-bold text-banyari-900">Banyari Main Chowk</div>
+                        <div class="text-[10px] text-banyari-600">0.2 km • 15 Mins Delivery</div>
+                    </button>
+                    <button onclick="selectQuickLocation('Banyari Colony')" class="p-2.5 border border-banyari-200 bg-banyari-50/60 rounded-xl text-left hover:border-banyari-500 transition-colors">
+                        <div class="text-xs font-bold text-banyari-900">Banyari Colony</div>
+                        <div class="text-[10px] text-banyari-600">0.6 km • 20 Mins Delivery</div>
+                    </button>
+                </div>
+
+                <div id="locationStatus" class="p-3 rounded-xl text-xs font-medium hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Order Sent Modal -->
+    <div id="orderSuccessModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/70 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl text-center relative overflow-hidden">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-3">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+
+            <h3 class="text-xl font-extrabold text-gray-900">WhatsApp Order Prepared!</h3>
+            <p class="text-xs text-gray-500 mt-1">If WhatsApp did not open automatically, click the button below to send your order directly to Banyari Store.</p>
+
+            <div class="bg-banyari-50 border border-banyari-200 rounded-2xl p-4 my-4">
+                <span class="text-[11px] font-bold tracking-wider text-banyari-800 uppercase block mb-1">Target Delivery Time</span>
+                <div id="countdownTimer" class="text-3xl font-black text-banyari-700 tracking-tight my-1">
+                    25:00
+                </div>
+                <div class="text-[11px] text-banyari-600 font-medium">
+                    <i class="fa-solid fa-motorcycle"></i> Dispatch from Banyari Store (&lt; 1 KM)
+                </div>
+            </div>
+
+            <a id="directWhatsappLink" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors mb-3 flex items-center justify-center gap-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Open WhatsApp Chat Now</span>
+            </a>
+
+            <button onclick="closeSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-2.5 px-4 rounded-xl text-xs transition-colors">
+                Back to Shopping
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 px-4 py-2 flex items-center justify-around shadow-lg">
+        <button onclick="resetFilters(); window.scrollTo({top:0, behavior:'smooth'});" class="flex flex-col items-center gap-1 text-banyari-700 font-semibold text-xs">
+            <i class="fa-solid fa-store text-lg"></i>
+            <span>Shop</span>
+        </button>
+        <button onclick="toggleAdminAuthModal()" class="flex flex-col items-center gap-1 text-gray-500 hover:text-banyari-600 text-xs">
+            <i class="fa-solid fa-user-pen text-lg"></i>
+            <span>Edit Price</span>
+        </button>
+        <button onclick="toggleCartDrawer(true)" class="flex flex-col items-center gap-1 text-emerald-600 font-bold text-xs relative">
+            <div class="relative">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span id="mobileCartBadge" class="absolute -top-1.5 -right-2.5 bg-amberGold-500 text-gray-900 font-extrabold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </div>
+            <span>WhatsApp Cart</span>
+        </button>
+    </nav>
+
+    <script>
+        // Initial Default Catalog Dataset
+        const DEFAULT_PRODUCTS = [
+            {
+                id: 'b1',
+                name: 'Aashirvaad Shuddh Chakki Atta',
+                hindiName: 'आशीर्वाद आटा',
+                category: 'Atta & Dal',
+                unit: '5 kg Pack',
+                mrp: 260,
+                price: 228,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b2',
+                name: 'Fortune Kachi Ghani Mustard Oil',
+                hindiName: 'फॉर्च्यून सरसों का तेल',
+                category: 'Oils & Ghee',
+                unit: '1 Litre Pouch',
+                mrp: 180,
+                price: 154,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b3',
+                name: 'Amul Taaza Toned Fresh Milk',
+                hindiName: 'अमूल ताज़ा दूध',
+                category: 'Dairy & Bakery',
+                unit: '500 ml Pouch',
+                mrp: 27,
+                price: 27,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b4',
+                name: 'Tata Salt Vacuum Salt',
+                hindiName: 'टाटा आयोडीन नमक',
+                category: 'Spices & Masala',
+                unit: '1 kg Pack',
+                mrp: 28,
+                price: 24,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b5',
+                name: 'Maggi 2-Minute Masala Noodles',
+                hindiName: 'मैगी नूडल्स',
+                category: 'Snacks & Beverages',
+                unit: '4 Pack (280g)',
+                mrp: 56,
+                price: 50,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b6',
+                name: 'Brooke Bond Red Label Tea',
+                hindiName: 'रेड लेबल चाय पत्ती',
+                category: 'Snacks & Beverages',
+                unit: '250g Pack',
+                mrp: 160,
+                price: 139,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b7',
+                name: 'Unpolished Toor / Arhar Dal',
+                hindiName: 'अरहर / तूर दाल',
+                category: 'Atta & Dal',
+                unit: '1 kg Pack',
+                mrp: 175,
+                price: 152,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1585992629288-8013824317f2?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b8',
+                name: 'Refined Sugar / Chini',
+                hindiName: 'शुद्ध चीनी',
+                category: 'Daily Essentials',
+                unit: '1 kg Pack',
+                mrp: 50,
+                price: 44,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1581441363689-1f3c3c414635?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b9',
+                name: 'Amul Butter Salted',
+                hindiName: 'अमूल मक्खन',
+                category: 'Dairy & Bakery',
+                unit: '100g Pack',
+                mrp: 58,
+                price: 56,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?auto=format&fit=crop&w=400&q=80'
+            },
+            {
+                id: 'b10',
+                name: 'MDH Deggi Mirch Powder',
+                hindiName: 'एमडीएच देगी मिर्च',
+                category: 'Spices & Masala',
+                unit: '100g Pack',
+                mrp: 92,
+                price: 82,
+                inStock: true,
+                image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80'
+            }
+        ];
+
+        const CATEGORIES = [
+            'All',
+            'Daily Essentials',
+            'Atta & Dal',
+            'Oils & Ghee',
+            'Spices & Masala',
+            'Snacks & Beverages',
+            'Dairy & Bakery'
+        ];
+
+        // Global State Variables
+        let products = [];
+        let cart = {}; 
+        let selectedCategory = 'All';
+        let searchQuery = '';
+        let timerInterval = null;
+        let shopWhatsAppNumber = '9876543210';
+        let isAdminActive = false;
+        let adminPIN = '1234'; // Default PIN
+
+        // LocalStorage Helper Function (FIX: Defined globally to avoid ReferenceError)
+        function saveProductsToStorage() {
+            try {
+                localStorage.setItem('banyari_store_products', JSON.stringify(products));
+            } catch (e) {
+                console.error("Error saving products to localStorage", e);
+            }
+        }
+
+        function loadAdminPinFromStorage() {
+            const storedPin = localStorage.getItem('banyari_admin_pin');
+            if (storedPin) {
+                adminPIN = storedPin;
+            } else {
+                adminPIN = '1234';
+                localStorage.setItem('banyari_admin_pin', adminPIN);
+            }
+        }
+
+        function loadProductsFromStorage() {
+            const stored = localStorage.getItem('banyari_store_products');
+            if (stored) {
+                try {
+                    products = JSON.parse(stored);
+                } catch (e) {
+                    products = [...DEFAULT_PRODUCTS];
+                    saveProductsToStorage();
+                }
+            } else {
+                products = [...DEFAULT_PRODUCTS];
+                saveProductsToStorage();
+            }
+
+            const storedPhone = localStorage.getItem('banyari_store_phone');
+            if (storedPhone) {
+                shopWhatsAppNumber = storedPhone;
+            }
+        }
+
+        // Initialize App on Page Load
+        window.onload = function() {
+            loadProductsFromStorage();
+            loadAdminPinFromStorage();
+            renderCategories();
+            populateCategoryDropdown();
+            renderProducts();
+            updateCartUI();
+        };
+
+        function resetToDefaultCatalog() {
+            if (confirm('Are you sure you want to reset all product prices back to original default catalog?')) {
+                products = [...DEFAULT_PRODUCTS];
+                saveProductsToStorage();
+                renderProducts();
+                updateCartUI();
+                alert('✅ Catalog reset to default prices successfully!');
+            }
+        }
+
+        // Admin Auth Login Handler
+        function toggleAdminAuthModal(show) {
+            const modal = document.getElementById('adminAuthModal');
+            if (!modal) return;
+            if (show === undefined) {
+                show = modal.classList.contains('hidden');
+            }
+            if (isAdminActive && show) {
+                exitAdminMode();
+                return;
+            }
+            if (show) {
+                document.getElementById('adminPinInput').value = '';
+                document.getElementById('adminAuthError').classList.add('hidden');
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('adminPinInput').value.trim();
+            if (pin === adminPIN) {
+                isAdminActive = true;
+                document.getElementById('adminAuthModal').classList.add('hidden');
+                document.getElementById('adminModeBanner').classList.remove('hidden');
+                document.getElementById('adminToolbar').classList.remove('hidden');
+                document.getElementById('adminLoginBtn').classList.add('bg-amberGold-500', 'text-gray-900');
+                renderProducts();
+            } else {
+                const err = document.getElementById('adminAuthError');
+                err.innerText = 'Incorrect Security PIN! Try default PIN: 1234';
+                err.classList.remove('hidden');
+            }
+        }
+
+        function openStorePhoneModal() {
+            document.getElementById('modalStorePhoneNumber').value = shopWhatsAppNumber;
+            document.getElementById('storePhoneModal').classList.remove('hidden');
+        }
+
+        function closeStorePhoneModal() {
+            document.getElementById('storePhoneModal').classList.add('hidden');
+        }
+
+        function handleSaveStoreNumber(e) {
+            e.preventDefault();
+            const num = document.getElementById('modalStorePhoneNumber').value.trim();
+            if (!num || num.length < 10) {
+                alert('Please enter a valid 10-digit WhatsApp phone number.');
+                return;
+            }
+            shopWhatsAppNumber = num;
+            localStorage.setItem('banyari_store_phone', shopWhatsAppNumber);
+            closeStorePhoneModal();
+            alert(`✅ Store WhatsApp number updated to +91 ${shopWhatsAppNumber}`);
+        }
+
+        function openChangePinModal() {
+            document.getElementById('changePinModal').classList.remove('hidden');
+            document.getElementById('currentPinInput').value = '';
+            document.getElementById('newPinInput').value = '';
+            document.getElementById('confirmNewPinInput').value = '';
+            document.getElementById('changePinError').classList.add('hidden');
+        }
+
+        function closeChangePinModal() {
+            document.getElementById('changePinModal').classList.add('hidden');
+        }
+
+        function handleSaveNewPin(e) {
+            e.preventDefault();
+            const currPin = document.getElementById('currentPinInput').value.trim();
+            const newPin = document.getElementById('newPinInput').value.trim();
+            const confirmPin = document.getElementById('confirmNewPinInput').value.trim();
+            const errDiv = document.getElementById('changePinError');
+
+            if (currPin !== adminPIN) {
+                errDiv.innerText = 'Current PIN is incorrect!';
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newPin.length < 4) {
+                errDiv.innerText = 'New PIN must be at least 4 digits long!';
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            if (newPin !== confirmPin) {
+                errDiv.innerText = 'New PIN and Confirm PIN do not match!';
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            adminPIN = newPin;
+            localStorage.setItem('banyari_admin_pin', adminPIN);
+            closeChangePinModal();
+            alert('✅ Security PIN changed successfully! Please use your new PIN for future logins.');
+        }
+
+        function resetAdminPIN() {
+            if (confirm('Are you sure you want to reset the Admin PIN back to default (1234)?')) {
+                adminPIN = '1234';
+                localStorage.setItem('banyari_admin_pin', '1234');
+                document.getElementById('adminAuthError').classList.add('hidden');
+                document.getElementById('pinModalHint').innerHTML = 'PIN reset to default: <b class="text-emerald-700">1234</b>';
+                alert('Admin PIN has been reset to default: 1234');
+            }
+        }
+
+        function exitAdminMode() {
+            isAdminActive = false;
+            document.getElementById('adminModeBanner').classList.add('hidden');
+            document.getElementById('adminToolbar').classList.add('hidden');
+            document.getElementById('adminLoginBtn').classList.remove('bg-amberGold-500', 'text-gray-900');
+            document.getElementById('adminLoginBtn').classList.add('bg-gray-100', 'text-gray-700');
+            renderProducts();
+        }
+
+        function populateCategoryDropdown() {
+            const select = document.getElementById('editProductCategory');
+            select.innerHTML = CATEGORIES.filter(c => c !== 'All').map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        function openEditModal(productId) {
+            const item = products.find(p => p.id === productId);
+            if (!item) return;
+
+            document.getElementById('editModalTitle').innerText = `Edit: ${item.name}`;
+            document.getElementById('editProductId').value = item.id;
+            document.getElementById('editProductName').value = item.name;
+            document.getElementById('editProductHindi').value = item.hindiName || '';
+            document.getElementById('editProductPrice').value = item.price;
+            document.getElementById('editProductMRP').value = item.mrp;
+            document.getElementById('editProductUnit').value = item.unit;
+            document.getElementById('editProductCategory').value = item.category;
+            document.getElementById('editProductImage').value = item.image;
+            document.getElementById('editProductInStock').checked = item.inStock !== false;
+
+            document.getElementById('editProductModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editProductModal').classList.add('hidden');
+        }
+
+        function openAddProductModal() {
+            document.getElementById('editModalTitle').innerText = 'Add New Grocery Product';
+            document.getElementById('editProductId').value = 'NEW_' + Date.now();
+            document.getElementById('editProductName').value = '';
+            document.getElementById('editProductHindi').value = '';
+            document.getElementById('editProductPrice').value = '';
+            document.getElementById('editProductMRP').value = '';
+            document.getElementById('editProductUnit').value = '1 kg';
+            document.getElementById('editProductCategory').value = 'Daily Essentials';
+            document.getElementById('editProductImage').value = 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80';
+            document.getElementById('editProductInStock').checked = true;
+
+            document.getElementById('editProductModal').classList.remove('hidden');
+        }
+
+        function saveProductChanges(e) {
+            e.preventDefault();
+            const id = document.getElementById('editProductId').value;
+            const name = document.getElementById('editProductName').value.trim();
+            const hindiName = document.getElementById('editProductHindi').value.trim();
+            const price = parseFloat(document.getElementById('editProductPrice').value);
+            const mrp = parseFloat(document.getElementById('editProductMRP').value);
+            const unit = document.getElementById('editProductUnit').value.trim();
+            const category = document.getElementById('editProductCategory').value;
+            const image = document.getElementById('editProductImage').value.trim();
+            const inStock = document.getElementById('editProductInStock').checked;
+
+            const existingIndex = products.findIndex(p => p.id === id);
+
+            const updatedProduct = {
+                id: id,
+                name: name,
+                hindiName: hindiName,
+                price: price,
+                mrp: mrp,
+                unit: unit,
+                category: category,
+                image: image || 'https://placehold.co/400x400/e2e8f0/1e293b?text=Banyari+Item',
+                inStock: inStock
+            };
+
+            if (existingIndex >= 0) {
+                products[existingIndex] = updatedProduct;
+            } else {
+                products.unshift(updatedProduct);
+            }
+
+            saveProductsToStorage();
+            renderProducts();
+            closeEditModal();
+            updateCartUI();
+        }
+
+        function deleteProduct(id) {
+            const item = products.find(p => p.id === id);
+            if (confirm(`Are you sure you want to delete "${item.name}" from Banyari Store?`)) {
+                products = products.filter(p => p.id !== id);
+                delete cart[id];
+                saveProductsToStorage();
+                renderProducts();
+                updateCartUI();
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = CATEGORIES.map(cat => {
+                const isActive = cat === selectedCategory;
+                return `
+                    <button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        isActive 
+                        ? 'bg-banyari-700 text-white shadow-md shadow-banyari-700/20' 
+                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                    }">
+                        ${cat === 'All' ? '🛒' : ''} ${cat}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            const filtered = products.filter(p => {
+                const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
+                const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      (p.hindiName && p.hindiName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                      p.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCat && matchesSearch;
+            });
+
+            document.getElementById('itemCountText').innerText = `Showing ${filtered.length} items`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            grid.innerHTML = filtered.map(product => {
+                const qty = cart[product.id] || 0;
+                const discountPct = product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
+                const isAvailable = product.inStock !== false;
+
+                return `
+                    <div class="bg-white rounded-2xl border ${isAdminActive ? 'border-amberGold-400 ring-2 ring-amberGold-200' : 'border-gray-100'} p-3 flex flex-col justify-between hover:shadow-lg transition-all duration-200 group relative">
+                        
+                        <div class="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
+                            ${discountPct > 0 ? `
+                                <span class="bg-amberGold-500 text-gray-900 font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow-xs">
+                                    ${discountPct}% OFF
+                                </span>
+                            ` : '<span></span>'}
+
+                            ${!isAvailable ? `
+                                <span class="bg-red-600 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow-xs">
+                                    Out of Stock
+                                </span>
+                            ` : ''}
+                        </div>
+
+                        <div>
+                            <div class="w-full h-32 sm:h-40 rounded-xl overflow-hidden bg-gray-50 mb-3 relative flex items-center justify-center">
+                                <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${!isAvailable ? 'opacity-40 grayscale' : ''}" loading="lazy" onerror="this.src='https://placehold.co/400x400/e2e8f0/1e293b?text=Banyari+Item'">
+                            </div>
+
+                            <h3 class="font-bold text-gray-900 text-xs sm:text-sm line-clamp-2 leading-snug">${product.name}</h3>
+                            <p class="text-[11px] text-gray-400 font-medium mt-0.5">${product.hindiName || ''}</p>
+                            <span class="inline-block mt-1 text-[10px] font-semibold text-banyari-800 bg-banyari-50 px-2 py-0.5 rounded-md">
+                                ${product.unit}
+                            </span>
+                        </div>
+
+                        <div class="mt-3 pt-2 border-t border-gray-50 flex flex-col gap-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="text-sm sm:text-base font-black text-gray-900">₹${product.price}</div>
+                                    ${product.mrp > product.price ? `<div class="text-[10px] text-gray-400 line-through">MRP ₹${product.mrp}</div>` : ''}
+                                </div>
+
+                                <div class="w-20 sm:w-24">
+                                    ${!isAvailable ? `
+                                        <span class="block text-center text-[11px] font-bold text-red-500 py-1 bg-red-50 rounded-lg">Unavailable</span>
+                                    ` : qty === 0 ? `
+                                        <button onclick="updateQty('${product.id}', 1)" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs py-1.5 rounded-xl transition-all flex items-center justify-center gap-1 active:scale-95">
+                                            <i class="fa-solid fa-plus text-[10px]"></i> ADD
+                                        </button>
+                                    ` : `
+                                        <div class="flex items-center justify-between bg-emerald-700 text-white rounded-xl p-1 shadow-md">
+                                            <button onclick="updateQty('${product.id}', -1)" class="w-6 h-6 flex items-center justify-center hover:bg-emerald-800 rounded-lg text-xs font-bold">
+                                                <i class="fa-solid fa-minus text-[10px]"></i>
+                                            </button>
+                                            <span class="text-xs font-bold">${qty}</span>
+                                            <button onclick="updateQty('${product.id}', 1)" class="w-6 h-6 flex items-center justify-center hover:bg-emerald-800 rounded-lg text-xs font-bold">
+                                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                            </button>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+
+                            ${isAdminActive ? `
+                                <div class="mt-1 pt-2 border-t border-dashed border-amberGold-300 flex items-center justify-between gap-1">
+                                    <button onclick="openEditModal('${product.id}')" class="flex-1 bg-amberGold-500 hover:bg-amberGold-600 text-gray-900 font-bold text-[11px] py-1 px-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit Price
+                                    </button>
+                                    <button onclick="deleteProduct('${product.id}')" class="bg-red-100 hover:bg-red-200 text-red-700 p-1.5 rounded-lg text-xs" title="Delete Product">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setCategory(cat) {
+            selectedCategory = cat;
+            renderCategories();
+            renderProducts();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            renderProducts();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderProducts();
+        }
+
+        function resetFilters() {
+            selectedCategory = 'All';
+            clearSearch();
+            renderCategories();
+        }
+
+        function updateQty(id, change) {
+            const current = cart[id] || 0;
+            const next = current + change;
+            if (next <= 0) {
+                delete cart[id];
+            } else {
+                cart[id] = next;
+            }
+            renderProducts();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+            document.getElementById('cartBadge').innerText = totalCount;
+            document.getElementById('mobileCartBadge').innerText = totalCount;
+            document.getElementById('drawerCartCount').innerText = `${totalCount} items selected`;
+
+            const container = document.getElementById('cartItemsContainer');
+
+            if (totalCount === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 text-3xl mx-auto mb-3">
+                            <i class="fa-brands fa-whatsapp"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-base">Cart is Empty</h4>
+                        <p class="text-xs text-gray-400 mt-1">Add items to place your WhatsApp order with Banyari Store!</p>
+                    </div>
+                `;
+                document.getElementById('summarySubtotal').innerText = '₹0';
+                document.getElementById('summarySavings').innerText = '₹0';
+                document.getElementById('summaryTotal').innerText = '₹0';
+                return;
+            }
+
+            let subtotal = 0;
+            let totalMRP = 0;
+
+            const itemsHTML = Object.keys(cart).map(id => {
+                const product = products.find(p => p.id === id);
+                if (!product) return '';
+                const qty = cart[id];
+                const itemTotal = product.price * qty;
+                subtotal += itemTotal;
+                totalMRP += (product.mrp * qty);
+
+                return `
+                    <div class="py-3 flex items-center gap-3">
+                        <img src="${product.image}" class="w-14 h-14 object-cover rounded-xl border border-gray-100 bg-gray-50" onerror="this.src='https://placehold.co/100x100?text=Banyari'">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-xs text-gray-900 leading-tight">${product.name}</h4>
+                            <div class="text-[10px] text-gray-400">${product.unit}</div>
+                            <div class="text-xs font-extrabold text-banyari-800 mt-0.5">₹${product.price} × ${qty} = ₹${itemTotal}</div>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                            <button onclick="updateQty('${product.id}', -1)" class="w-5 h-5 bg-white rounded flex items-center justify-center text-xs font-bold text-gray-700 shadow-xs">-</button>
+                            <span class="text-xs font-bold px-1">${qty}</span>
+                            <button onclick="updateQty('${product.id}', 1)" class="w-5 h-5 bg-white rounded flex items-center justify-center text-xs font-bold text-gray-700 shadow-xs">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = itemsHTML;
+
+            const savings = Math.max(0, totalMRP - subtotal);
+            document.getElementById('summarySubtotal').innerText = `₹${subtotal}`;
+            document.getElementById('summarySavings').innerText = `₹${savings}`;
+            document.getElementById('summaryTotal').innerText = `₹${subtotal}`;
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cartDrawer');
+            const backdrop = document.getElementById('cartBackdrop');
+            const panel = document.getElementById('cartPanel');
+
+            if (open) {
+                drawer.classList.remove('pointer-events-none');
+                backdrop.classList.remove('opacity-0', 'pointer-events-none');
+                backdrop.classList.add('opacity-100', 'pointer-events-auto');
+                panel.classList.remove('translate-x-full');
+            } else {
+                backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+                backdrop.classList.add('opacity-0', 'pointer-events-none');
+                panel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    drawer.classList.add('pointer-events-none');
+                }, 300);
+            }
+        }
+
+        function openRadiusModal() {
+            document.getElementById('radiusModal').classList.remove('hidden');
+        }
+
+        function closeRadiusModal() {
+            document.getElementById('radiusModal').classList.add('hidden');
+        }
+
+        function verifyLocation() {
+            const val = document.getElementById('pincodeInput').value.trim();
+            const status = document.getElementById('locationStatus');
+            status.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-banyari-50', 'text-banyari-800');
+
+            if (!val) {
+                status.classList.add('bg-red-50', 'text-red-700');
+                status.innerText = '⚠️ Please enter a locality name or pincode.';
+                return;
+            }
+
+            status.classList.add('bg-banyari-50', 'text-banyari-800');
+            status.innerHTML = `✅ Location <b>${val}</b> is inside Banyari Store's 1 KM Fast Delivery Zone!`;
+            
+            document.getElementById('headerLocationText').innerText = `${val} (< 1 KM)`;
+            document.getElementById('mobileLocationText').innerText = val;
+            
+            setTimeout(() => {
+                closeRadiusModal();
+            }, 1800);
+        }
+
+        function selectQuickLocation(name) {
+            document.getElementById('headerLocationText').innerText = `${name} (< 1 KM)`;
+            document.getElementById('mobileLocationText').innerText = name;
+            closeRadiusModal();
+        }
+
+        // WhatsApp Order Dispatch Function
+        function placeWhatsAppOrder() {
+            const totalCount = Object.values(cart).reduce((a, b) => a + b, 0);
+            if (totalCount === 0) {
+                alert('Your basket is empty. Please select items first!');
+                return;
+            }
+
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const landmark = document.getElementById('custLandmark').value.trim();
+
+            if (!name || !phone || !address) {
+                alert('Please enter your Name, Phone Number, and Address before sending the order via WhatsApp.');
+                return;
+            }
+
+            let msg = `🛒 *NEW GROCERY ORDER - BANYARI GERNAL STORE*\n`;
+            msg += `------------------------------------\n`;
+            msg += `👤 *Customer Name:* ${name}\n`;
+            msg += `📞 *Phone Number:* ${phone}\n`;
+            msg += `📍 *Delivery Address:* ${address}\n`;
+            if (landmark) msg += `🏛️ *Landmark:* ${landmark}\n`;
+            msg += `🚀 *Delivery Radius:* Express 1 KM Zone (15-30 Mins)\n`;
+            msg += `------------------------------------\n`;
+            msg += `📦 *ITEMS ORDERED:*\n\n`;
+
+            let totalAmount = 0;
+            Object.keys(cart).forEach((id, index) => {
+                const product = products.find(p => p.id === id);
+                if (product) {
+                    const qty = cart[id];
+                    const lineTotal = product.price * qty;
+                    totalAmount += lineTotal;
+                    msg += `${index + 1}. *${product.name}*\n   Qty: ${qty} x ₹${product.price} = ₹${lineTotal}\n`;
+                }
+            });
+
+            msg += `\n------------------------------------`;
+            msg += `\n💰 *TOTAL AMOUNT:* ₹${totalAmount}`;
+            msg += `\n🚚 *DELIVERY CHARGE:* FREE (Under 1 KM)`;
+            msg += `\n------------------------------------`;
+            msg += `\nPlease confirm and pack this order as soon as possible!`;
+
+            const encodedText = encodeURIComponent(msg);
+            const waUrl = `https://wa.me/${shopWhatsAppNumber}?text=${encodedText}`;
+
+            document.getElementById('directWhatsappLink').href = waUrl;
+            window.open(waUrl, '_blank');
+
+            toggleCartDrawer(false);
+            document.getElementById('orderSuccessModal').classList.remove('hidden');
+
+            cart = {};
+            renderProducts();
+            updateCartUI();
+
+            startDeliveryTimer(25 * 60);
+        }
+
+        function startDeliveryTimer(durationSeconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            let timer = durationSeconds;
+            const timerDisplay = document.getElementById('countdownTimer');
+
+            timerInterval = setInterval(() => {
+                const minutes = parseInt(timer / 60, 10);
+                const seconds = parseInt(timer % 60, 10);
+
+                const displayMin = minutes < 10 ? "0" + minutes : minutes;
+                const displaySec = seconds < 10 ? "0" + seconds : seconds;
+
+                timerDisplay.innerText = displayMin + ":" + displaySec;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.innerText = "DISPATCH READY!";
+                }
+            }, 1000);
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('orderSuccessModal').classList.add('hidden');
+            if (timerInterval) clearInterval(timerInterval);
+        }
+    </script>
+</body>
+</html>
